@@ -33,6 +33,10 @@ func (c *Cluster) CreatePod() {
 
 func (c *Cluster) TerminatePod() {
 	c.mu.Lock()
+	if len(c.pods) == 0 {
+		return
+	}
+
 	id := c.pods[len(c.pods)-1].Id
 	c.pods = c.pods[:len(c.pods)-1]
 	fmt.Println("Terminated pod with id", id)
