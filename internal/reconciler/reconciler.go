@@ -15,15 +15,16 @@ func NewReconciler(cluster *cluster.Cluster, workqueue <-chan struct{}) *Reconci
 }
 
 func (r *Reconciler) reconcile() {
-	pods, replicas := r.cluster.State()
-	diff := replicas - pods
+	for {
+		pods, replicas := r.cluster.State()
 
-	if diff > 0 {
-		for range diff {
-			r.cluster.CreatePod()
+		if pods == replicas {
+			return
 		}
-	} else {
-		for range -diff {
+
+		if replicas > pods {
+			r.cluster.CreatePod()
+		} else {
 			r.cluster.TerminatePod()
 		}
 	}
