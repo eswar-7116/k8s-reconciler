@@ -48,6 +48,10 @@ func (a *APIServer) SetReplicas(replicas int) {
 	a.notify()
 }
 
+func (a *APIServer) State() (int, int) {
+	return a.cluster.State()
+}
+
 func (a *APIServer) notify() {
 	select {
 	case a.workqueue <- struct{}{}:

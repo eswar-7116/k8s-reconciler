@@ -15,6 +15,20 @@ func TestInitialState(t *testing.T) {
 	}
 }
 
+func TestState(t *testing.T) {
+	api := NewAPIServer(4)
+	api.SetReplicas(6)
+	api.Close()
+
+	pods, replicas := api.State()
+	if replicas != 6 {
+		t.Errorf("expected desired replicas 6, got %d", replicas)
+	}
+	if pods != 6 {
+		t.Errorf("expected 6 running pods, got %d", pods)
+	}
+}
+
 func TestScaleUp(t *testing.T) {
 	api := NewAPIServer(2)
 	api.SetReplicas(5)
