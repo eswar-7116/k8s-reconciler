@@ -1,16 +1,22 @@
 package reconciler
 
-import "github.com/eswar-7116/k8s-reconciler/internal/cluster"
+import (
+	"sync"
+
+	"github.com/eswar-7116/k8s-reconciler/internal/cluster"
+)
 
 type Reconciler struct {
 	cluster   *cluster.Cluster
 	workqueue <-chan struct{}
+	wg        *sync.WaitGroup
 }
 
-func NewReconciler(cluster *cluster.Cluster, workqueue <-chan struct{}) *Reconciler {
+func NewReconciler(cluster *cluster.Cluster, workqueue <-chan struct{}, wg *sync.WaitGroup) *Reconciler {
 	return &Reconciler{
 		cluster:   cluster,
 		workqueue: workqueue,
+		wg:        wg,
 	}
 }
 
@@ -31,9 +37,9 @@ func (r *Reconciler) reconcile() {
 }
 
 func (r *Reconciler) Start() {
-	go func() {
+	r.wg.Go(func() {
 		for range r.workqueue {
 			r.reconcile()
 		}
-	}()
+	})
 }
